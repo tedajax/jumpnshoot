@@ -29,6 +29,7 @@ function love.load()
 	globals.block:add_component("CAABoundingBox")
 	globals.block:get_component("CPositionable").position = Vector(50, 450)
 	globals.block:get_component("CAABoundingBox").static = true
+	globals.block:get_component("CAABoundingBox").layer = "wall"
 
 	for key, obj in pairs(globals.gameObjects) do
 		obj:start()
