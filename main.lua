@@ -2,6 +2,8 @@ Vector = require 'hump.vector'
 Timer = require 'hump.timer'
 require 'locket.locket'
 require 'collisionmanager'
+require 'colorpalette'
+require 'gameobjectfactory'
 
 function love.load()
 	globals = {}
@@ -10,6 +12,18 @@ function love.load()
 	globals.dt = 0
 	
 	Timer.addPeriodic(0.05, function() globals.fps = 1 / globals.dt end)
+
+	local palette = ColorPalette()
+	palette:gen_test_palette()
+	testdata = {1, 1, 1, 1, 1, 1, 1, 1,
+				0, 0, 1, 0, 0, 1, 0, 0,
+				0, 0, 1, 0, 0, 1, 0, 0,
+				0, 0, 1, 0, 0, 1, 0, 0,
+				0, 0, 1, 0, 0, 1, 0, 0,
+				0, 0, 1, 0, 0, 1, 0, 0,
+				0, 0, 1, 0, 0, 1, 0, 0,
+				1, 1, 1, 1, 1, 1, 1, 1}
+	testimage = palette:create_image(testdata, 64, 64, 8)
 
 	globals.gameObjects = {}
 	globals.gameObjects.player = GameObject()
@@ -22,22 +36,19 @@ function love.load()
 	globals.player:add_component("CAABoundingBox")
 	globals.player:add_component("CGravity")
 
-	globals.gameObjects.block = GameObject()
-	globals.block = globals.gameObjects.block
-	globals.block:add_component("CPositionable")
-	globals.block:add_component("CAlignable")
-	globals.block:add_component("CAABoundingBox")
-	globals.block:get_component("CPositionable").position = Vector(50, 450)
-	globals.block:get_component("CAABoundingBox").static = true
-	globals.block:get_component("CAABoundingBox").layer = "wall"
+	globals.collision = CollisionManager()
+
+	for i = 0, 20 do
+		local block = create_block(Vector(i * 64, 500), testimage)
+		table.insert(globals.gameObjects, block)
+	end
 
 	for key, obj in pairs(globals.gameObjects) do
 		obj:start()
+		if obj:get_component("CAABoundingBox") ~= nil then
+			globals.collision:register(obj)
+		end
 	end
-
-	globals.collision = CollisionManager()
-	globals.collision:register(globals.player)
-	globals.collision:register(globals.block)
 end
 
 function love.keypressed(key, unicode)
