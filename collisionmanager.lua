@@ -19,6 +19,7 @@ CollisionManager = Class
 				self.cells[i][j] = {}
 			end
 		end
+		self.cellRects = self:get_cells_as_rectangles()
 	end	
 }
 
@@ -134,18 +135,23 @@ function CollisionManager:update(dt)
 			for i = 1, table.getn(cell) - 1 do
 				for j = i + 1, table.getn(cell) do
 					local o1, o2 = cell[i], cell[j]
-					if o1:collides(o2) then
-						if o1.collidingWith[o2] or o2.collidingWith[o1] then
-							o1:send_message("on_collision_stay",o2)
-							o2:send_message("on_collision_stay", o1)
-						else
-							o1:send_message("on_collision_enter", o2)
-							o2:send_message("on_collision_enter", o1)
+					if not (o1.static and o2.static) then
+						if o1.static then
+							o1, o2 = o2, o1
 						end
-					else
-						if o1.collidingWith[o2] or o2.collidingWith[o1] then
-							o1:send_message("on_collision_exit", o2)
-							o2:send_message("on_collision_exit", o1)
+						if o1:collides(o2) then
+							if o1.collidingWith[o2] or o2.collidingWith[o1] then
+								o1:send_message("on_collision_stay",o2)
+								o2:send_message("on_collision_stay", o1)
+							else
+								o1:send_message("on_collision_enter", o2)
+								o2:send_message("on_collision_enter", o1)
+							end
+						else
+							if o1.collidingWith[o2] or o2.collidingWith[o1] then
+								o1:send_message("on_collision_exit", o2)
+								o2:send_message("on_collision_exit", o1)
+							end
 						end
 					end
 				end
@@ -169,4 +175,19 @@ function CollisionManager:debug_render()
 		local c = (j - 1) * self.cellSize - self.offset
 		love.graphics.line(c, top, c, bottom)
 	end
+end
+
+function CollisionManager:get_cells_as_rectangles()
+	local result = {}
+	for i, row in ipairs(self.cells) do
+		for j, _ in ipairs(row) do
+			local topleftx = (j - 1) * self.cellSize - self.offset
+			local toplefty = (i - 1) * self.cellSize - self.offset
+			local botrightx = j * self.cellSize - self.offset
+			local botrighty = i * self.cellSize - self.offset
+			table.insert(result, {tl = Vector(topleftx, toplefty), br = Vector(botrightx, botrighty)})
+		end
+	end
+
+	return result
 end
