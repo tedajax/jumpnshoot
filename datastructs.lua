@@ -82,8 +82,30 @@ function Queue:size()
 	return self.tail - self.head
 end
 
-function Set(list)
-	local set = {}
-	for _, l in ipairs(list) do set[l] = true end
-	return set
+Set = Class
+{
+	name = "Set",
+	function(self, list)
+		self.objects = {}
+		self.size = 0
+		list = list or {}
+		for _, l in ipairs(list) do 
+			self.objects[l] = true 
+			self.size = self.size + 1
+		end
+	end
+}
+
+function Set:add(key)
+	self.objects[key] = true
+	self.size = self.size + 1
+end
+
+function Set:remove(key)
+	self.objects[key] = nil
+	self.size = self.size - 1
+end
+
+function Set:contains(key)
+	return self.objects[key] ~= nil
 end

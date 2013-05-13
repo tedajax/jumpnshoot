@@ -12,6 +12,18 @@ CollisionManager = Class
 		self.cells = {}
 		self.maxCells = 50
 		self.offset = self.maxCells / 2 * self.cellSize
+
+		-- HACK ALERT
+		-- There's issues with objects not ending their collisions if one of them happens
+		-- to be on the edge of a cell
+		-- we'll just increase the effective size of the collision boxes by this amount
+		-- when determining if the object is in a cell or not to "fix this"
+		self.fudge = 10
+		self.tlFudge = Vector(-self.fudge, -self.fudge)
+		self.trFudge = Vector(self.fudge, -self.fudge)
+		self.blFudge = Vector(-self.fudge, self.fudge)
+		self.brFudge = Vector(self.fudge, self.fudge)
+
 		-- initialize a few cells
 		for i = 1, self.maxCells do
 			self.cells[i] = {}
@@ -27,7 +39,7 @@ function CollisionManager:register(obj)
 	local coll = obj:get_component("CAABoundingBox")
 	if coll ~= nil then
 		table.insert(self.objects, coll)
-		coll.cells = self:get_object_cells(coll)
+		coll.cells = self:get_object_cells(coll).objects
 
 		for cell, _ in pairs(coll.cells) do
 			table.insert(cell, coll)
@@ -64,10 +76,10 @@ function CollisionManager:get_cell(position)
 end
 
 function CollisionManager:get_object_cells(collObj)
-	local tl = self:get_cell(collObj:topleft())
-	local tr = self:get_cell(collObj:topright())
-	local bl = self:get_cell(collObj:bottomleft())
-	local br = self:get_cell(collObj:bottomright())	
+	local tl = self:get_cell(collObj:topleft() + self.tlFudge)
+	local tr = self:get_cell(collObj:topright() + self.trFudge)
+	local bl = self:get_cell(collObj:bottomleft() + self.blFudge)
+	local br = self:get_cell(collObj:bottomright() + self.brFudge) 	
 
 	local list = {}
 	if tl ~= nil then table.insert(list, tl) end
@@ -79,10 +91,10 @@ function CollisionManager:get_object_cells(collObj)
 end
 
 function CollisionManager:object_in_cell(obj, cell)
-	local tl = self:get_cell(obj:topleft())
-	local tr = self:get_cell(obj:topright())
-	local bl = self:get_cell(obj:bottomleft())
-	local br = self:get_cell(obj:bottomright())
+	local tl = self:get_cell(obj:topleft() + self.tlFudge)
+	local tr = self:get_cell(obj:topright() + self.trFudge)
+	local bl = self:get_cell(obj:bottomleft() + self.blFudge)
+	local br = self:get_cell(obj:bottomright()+ self.brFudge)
 
 	return tl == cell or tr == cell or bl == cell or br == cell
 end
@@ -100,7 +112,7 @@ function CollisionManager:update_object_cells(collObj)
 		end		
 	end
 
-	local cells = self:get_object_cells(collObj)
+	local cells = self:get_object_cells(collObj).objects
 	for c1, _ in pairs(cells) do
 		local found = false
 		for c2, _ in pairs(collObj.cells) do
@@ -123,6 +135,39 @@ function CollisionManager:get_cell_indices(position)
 	return cx, cy
 end
 
+function CollisionManager:collision_response(o1, o2)
+	if o1.static and o2.static then return end
+	if o1.static then o1, o2 = o2, o1 end
+	local o1collresponse, o2collresponse = "collision", "collision"
+
+	if o2.trigger then o1collresponse = "trigger" end
+	if o1.trigger then o2collresponse = "trigger" end
+
+	local c1, c2 = nil, nil
+
+	if not o2.trigger then c1 = o1:collides(o2)	end
+	if not o1.trigger then c2 = o2:collides(o1) end
+
+	local param1, param2 = c1, c2
+	if o2.trigger then param1 = o2 end
+	if o1.trigger then param2 = o1 end
+
+	if o1:intersects(o2) then
+		if o1.collidingWith[o2] or o2.collidingWith[o1] then
+			o1:send_message("on_"..o1collresponse.."_stay", param1)
+			o2:send_message("on_"..o2collresponse.."_stay", param2)
+		else
+			o1:send_message("on_"..o1collresponse.."_enter", param1)
+			o2:send_message("on_"..o2collresponse.."_enter", param2)
+		end
+	else
+		if o1.collidingWith[o2] or o2.collidingWith[o1] then
+			o1:send_message("on_"..o1collresponse.."_exit", param1)
+			o2:send_message("on_"..o2collresponse.."_exit", param2)
+		end
+	end
+end
+
 function CollisionManager:update(dt)
 	for _, obj in ipairs(self.objects) do
 		if not obj.static then
@@ -135,25 +180,7 @@ function CollisionManager:update(dt)
 			for i = 1, table.getn(cell) - 1 do
 				for j = i + 1, table.getn(cell) do
 					local o1, o2 = cell[i], cell[j]
-					if not (o1.static and o2.static) then
-						if o1.static then
-							o1, o2 = o2, o1
-						end
-						if o1:collides(o2) then
-							if o1.collidingWith[o2] or o2.collidingWith[o1] then
-								o1:send_message("on_collision_stay",o2)
-								o2:send_message("on_collision_stay", o1)
-							else
-								o1:send_message("on_collision_enter", o2)
-								o2:send_message("on_collision_enter", o1)
-							end
-						else
-							if o1.collidingWith[o2] or o2.collidingWith[o1] then
-								o1:send_message("on_collision_exit", o2)
-								o2:send_message("on_collision_exit", o1)
-							end
-						end
-					end
+					self:collision_response(o1, o2)
 				end
 			end
 		end
