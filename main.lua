@@ -20,10 +20,10 @@ function love.load()
 	palette:gen_test_palette()
 	blockImageData = {1, 1, 1, 1, 1, 1, 1, 1,
 					  0, 0, 1, 0, 0, 1, 0, 0,
-				  	  0, 0, 1, 0, 0, 1, 0, 0,
+				  	  1, 1, 1, 1, 1, 1, 1, 1,
 				  	  0, 0, 1, 0, 0, 1, 0, 0,
 					  0, 0, 1, 0, 0, 1, 0, 0,
-					  0, 0, 1, 0, 0, 1, 0, 0,
+					  1, 1, 1, 1, 1, 1, 1, 1,
 					  0, 0, 1, 0, 0, 1, 0, 0,
 					  1, 1, 1, 1, 1, 1, 1, 1}
 	blockImage = palette:create_image(blockImageData, 64, 64, 8)
