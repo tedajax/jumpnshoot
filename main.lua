@@ -41,6 +41,18 @@ function love.load()
 					   4, 4, 4, 4, 4, 4, 4, 4}
 	playerImage = playerPalette:create_image(playerImageData, 16, 16, 2)
 
+	flagImageData = {
+		1, 1, 1, 1, 0, 0, 0, 0,
+		1, 1, 1, 1, 1, 1, 0, 0,
+		1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 0, 0,
+		1, 1, 1, 1, 0, 0, 0, 0,
+		1, 1, 0, 0, 0, 0, 0, 0,
+		1, 1, 0, 0, 0, 0, 0, 0,
+		1, 1, 0, 0, 0, 0, 0, 0
+	}
+	flagImage = playerPalette:create_image(flagImageData, 16, 16, 2)
+
 	globals.gameObjects = {}
 	globals.collision = CollisionManager()
 
@@ -58,7 +70,7 @@ function love.load()
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -84,19 +96,24 @@ function love.load()
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 	}
 
-	print(#room)
-
 	local roomWidth = 49
 	local roomHeight = 33
 	local a = 50 * 34
-	print(a)
 	for i = 0, roomHeight do
 		for j = 0, roomWidth do
 			local index = i * (roomWidth + 1) + j + 1
 			-- print(i.." "..j.." "..index)
-			if room[index] > 0 then
+			if room[index] == 1 then
 				local block = create_block(Vector(j * 16, i * 16), blockImage)
 				table.insert(globals.gameObjects, block)
+			elseif room[index] == 2 then
+				if globals.flag == nil then
+					globals.flag = create_flag(Vector(j * 16, i * 16), flagImage)
+					globals.gameObjects.flag = globals.flag
+					globals.player:get_component("CPositionable").position = Vector(j * 16, i * 16)
+				else
+					print("Already have a flag in level data, can't have more than one")
+				end
 			end
 		end
 	end
@@ -122,8 +139,8 @@ function love.update(dt)
 		obj:req_update(dt)
 	end
 
-	local look = globals.player:get_component("CPositionable").position
-	--globals.camera:lookAt(look.x, look.y)
+	--local look = globals.player:get_component("CPositionable").position
+	-- globals.camera:lookAt(look.x, look.y)
 	
 	globals.collision:update(dt)
 
