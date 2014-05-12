@@ -105,7 +105,6 @@ function CollisionManager:update_object_cells(collObj)
 			for i, o in ipairs(cell) do
 				if o == collObj then
 					table.remove(cell, i)
-					print("removing object from cell")
 					break
 				end
 			end
@@ -122,7 +121,6 @@ function CollisionManager:update_object_cells(collObj)
 		end
 		if not found then
 			table.insert(c1, collObj)
-			print("adding object to cell")
 		end
 	end
 	collObj.cells = cells
@@ -202,6 +200,25 @@ function CollisionManager:debug_render()
 		local c = (j - 1) * self.cellSize - self.offset
 		love.graphics.line(c, top, c, bottom)
 	end
+
+	love.graphics.setColor(0, 255, 0)
+	for _, row in ipairs(self.cells) do
+		for _, cell in ipairs(row) do
+			for i = 1, table.getn(cell) - 1 do
+				self:debug_render_collider(cell[i])
+			end
+		end
+	end
+end
+
+function CollisionManager:debug_render_collider(c)
+	local tl = c:topleft()
+	local br = c:bottomright()
+
+	love.graphics.line(tl.x, tl.y, br.x, tl.y)
+	love.graphics.line(tl.x, tl.y, tl.x, br.y)
+	love.graphics.line(tl.x, br.y, br.x, br.y)
+	love.graphics.line(br.x, tl.y, br.x, br.y)
 end
 
 function CollisionManager:get_cells_as_rectangles()

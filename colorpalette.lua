@@ -6,8 +6,13 @@ ColorPalette = Class
 	name = "ColorPalette",
 	function(self)
 		self.palette = {}
+		self.palette.default = Color.clear
 	end
 }
+
+function ColorPalette:set_default(color)
+	self.palette.default = color or Color.clear
+end
 
 function ColorPalette:generate(data)
 	for index, color in ipairs(data) do
@@ -22,6 +27,7 @@ end
 
 function ColorPalette:get_color(index)
 	if self.palette[index] ~= nil then
+		local c = self.palette[index]
 		return self.palette[index]
 	else
 		return self.palette.default
