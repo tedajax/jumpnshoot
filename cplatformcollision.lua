@@ -41,9 +41,9 @@ function CPlatformCollision:resolve_collision(collision)
 	elseif side == "bottom" then
 		y = cy + height
 	elseif side == "left" then
-		x = cx - width - 1
+		x = cx - width - 0
 	elseif side == "right" then
-		x = cx + width + 1
+		x = cx + width + 0
 	end
 
 	self.positionable.position.x = x

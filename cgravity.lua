@@ -34,7 +34,6 @@ end
 function CGravity:hit_wall(side)
 	self.onGround = true
 	self.velocity = Vector.zero
-	print("gravity hit ground")
 end
 
 function CGravity:get_blank_data()

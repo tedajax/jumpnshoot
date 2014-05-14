@@ -125,18 +125,20 @@ function CAABoundingBox:collides(other)
 end
 
 function CAABoundingBox:intersect_side(other, tolerance)
-	tolerance = 16 -- REMOVE THIS LATER THIS IS FOR TESTING
+	tolerance = 2 -- REMOVE THIS LATER THIS IS FOR TESTING
 
 	local diff = self.positionable.position - other.positionable.position
 	local norm = diff:normalized()
 
-	local angle = math.atan2(norm.y, norm.x) * 180 / math.pi + 180
+	local angle = math.atan2(norm.y, norm.x) * 180 / math.pi + 135
 
-	if angle >= 45 and angle < 135 then
+	angle = angle % 360
+
+	if angle >= 0 and angle < 90 then
 		return "top"
-	elseif angle >= 135 and angle < 225 then
+	elseif angle >= 90 and angle < 180 then
 		return "right"
-	elseif angle >= 225 and angle < 315 then
+	elseif angle >= 180 and angle < 269 then
 		return "bottom"
 	else
 		return "left"

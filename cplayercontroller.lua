@@ -68,13 +68,15 @@ function CPlayerController:update(dt)
 end
 
 function CPlayerController:hit_wall(side)
+	print("hit "..side)
 	if side == "top" then
 		self.onGround = true
-	elseif side == "right" then
+	elseif side == "left" then
 		if self.velocity.x > 0 then
+			print("stop right")
 			self.velocity.x = 0
 		end
-	elseif side == "left" then
+	elseif side == "right" then
 		if self.velocity.x < 0 then
 			self.velocity.x = 0
 		end
