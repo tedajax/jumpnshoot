@@ -31,7 +31,7 @@ function CRigidBody:render()
 	if not self.shape:typeOf("CircleShape") then
 		love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
 	else
-		love.graphics.circle("fill", self.body:getWorldPoints(self.shape:getPosition()), self.shape:getRadius())
+		--love.graphics.circle("fill", self.body:getWorldPoints(self.shape:getPosition()), self.shape:getRadius())
 	end
 end
 

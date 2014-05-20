@@ -15,7 +15,7 @@ function love.load()
 
 	globals.camera = Camera(400, 300)
 
-	pxToMeter = 64
+	pxToMeter = 128
 	love.physics.setMeter(pxToMeter)
 	globals.world = love.physics.newWorld(0, 9.8 * pxToMeter, true)
 	
@@ -114,6 +114,92 @@ function love.load()
 			-- globals.collision:register(obj)
 		end
 	end
+
+	globals.room = {}
+	local roomcopy = {}
+	for i, v in ipairs(room) do
+		roomcopy[i] = v
+	end
+
+	local tlx = -1
+	local tly = -1
+	for i = 0, roomHeight - 1 do
+		for j = 0, roomWidth - 1 do
+			local index = i * roomWidth + j + 1
+			local minx = -1
+			local miny = -1
+			local maxx = -1
+			local maxy = -1
+
+			if roomcopy[index] == 1 then
+				-- print(j.." "..i.." "..index)
+				minx, miny, maxx, maxy = findPhysBox(roomcopy, roomWidth, roomHeight, j, i)
+
+				local tx = (((maxx - minx) + 1) / 2 + minx) * tileWidth
+				local ty = (((maxy - miny) + 1) / 2 + miny) * tileHeight
+				print(tx.." "..ty)
+
+				local physBox = {}
+				physBox.body = love.physics.newBody(globals.world, tx, ty, "static")
+				physBox.shape = love.physics.newRectangleShape(0,
+					0,
+					((maxx - minx) + 1) * tileWidth,
+					((maxy - miny) + 1) * tileHeight,
+					0)
+				physBox.fixture = love.physics.newFixture(physBox.body, physBox.shape, 1)
+				physBox.fixture:setRestitution(0)
+
+				table.insert(globals.room, physBox)
+			end
+		end
+	end
+end
+
+function findPhysBox(room, roomwidth, roomheight, tlx, tly)
+	-- print(tlx.." "..tly)
+	local minx = tlx
+	local miny = tly
+	local maxx = minx
+	local maxy = miny
+	
+	for x = minx, roomwidth - 1 do
+		local index = miny * roomwidth + x + 1
+		if room[index] ~= 1 then
+			break
+		else
+			maxx = maxx + 1
+		end
+	end
+			
+	for y = miny + 1, roomheight - 1 do
+		local goDown = true
+		for x = minx, maxx - 1 do
+			local index = y * roomwidth + x + 1
+			-- print(minx.." "..maxx.." "..index)
+			if room[index] ~= 1 then
+				goDown = false
+				-- print("no down")
+			end
+		end
+		if goDown then
+			maxy = maxy + 1
+		else
+			break
+		end
+	end
+
+	for y = miny, maxy do
+		for x = minx, maxx - 1 do
+			local index = y * roomwidth + x + 1
+			-- print(index)
+
+			if room[index] == 1 then
+				room[index] = 0
+			end
+		end
+	end
+
+	return minx, miny, maxx - 1, maxy
 end
 
 function love.keypressed(key, unicode)
@@ -144,8 +230,14 @@ function love.draw()
 	-- globals.collision:debug_render()
 	for key, obj in pairs(globals.gameObjects) do
 		obj:req_render(dt)
-	end
+	end	
+
 	globals.camera:detach()
+
+	love.graphics.setColor(255, 255, 0)
+	for i, v in ipairs(globals.room) do
+		love.graphics.polygon("line", v.body:getWorldPoints(v.shape:getPoints()))
+	end
 
 	love.graphics.print("FPS : "..string.format("%.0f", globals.fps), 5, 5)
 end
