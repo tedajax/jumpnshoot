@@ -89,6 +89,17 @@ function CPlayerController:update(dt)
 	end
 end
 
+function CPlayerController:on_collision_enter(collision)
+	if collision.collider.gameObject.tag == "spike" then
+		self:respawn()
+	end
+end
+
+function CPlayerController:respawn()
+	local x, y = globals.flag:get_component("CPositionable").position:unpack()
+	self.rigidbody.body:setPosition(x, y - 2)
+end
+
 function CPlayerController:hit_wall(side)
 	print("hit "..side)
 	if side == "top" then

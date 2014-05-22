@@ -124,9 +124,7 @@ function CAABoundingBox:collides(other)
 	return collision
 end
 
-function CAABoundingBox:intersect_side(other, tolerance)
-	tolerance = 2 -- REMOVE THIS LATER THIS IS FOR TESTING
-
+function CAABoundingBox:intersect_side(other)
 	local diff = self.positionable.position - other.positionable.position
 	local norm = diff:normalized()
 

@@ -29,7 +29,7 @@ function CRigidBody:render()
 	love.graphics.setColor(255, 255, 0)
 
 	if not self.shape:typeOf("CircleShape") then
-		love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
+		-- love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
 	else
 		--love.graphics.circle("fill", self.body:getWorldPoints(self.shape:getPosition()), self.shape:getRadius())
 	end

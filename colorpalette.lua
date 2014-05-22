@@ -34,14 +34,16 @@ function ColorPalette:get_color(index)
 	end
 end
 
-function ColorPalette:create_image(data, width, height, pixelSize)
-	local result = love.image.newImageData(width * pixelSize, height * pixelSize)
+function ColorPalette:create_image(data, width, height, pixelWidth, pixelHeight)
+	pixelHeight = pixelHeight or pixelWidth
+
+	local result = love.image.newImageData(width * pixelWidth, height * pixelHeight)
 
 	local pIndex = 1
-	for x = 0, (width - 1), pixelSize do
-		for y = 0, (height - 1), pixelSize do
-			for px = 0, pixelSize - 1 do
-				for py = 0, pixelSize - 1 do
+	for x = 0, (width - 1), pixelWidth do
+		for y = 0, (height - 1), pixelHeight do
+			for px = 0, pixelWidth - 1 do
+				for py = 0, pixelHeight - 1 do
 					local ix = x + px
 					local iy = y + py
 					result:setPixel(iy, ix, self:get_color(data[pIndex]):unpack())

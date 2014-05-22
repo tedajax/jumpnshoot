@@ -22,16 +22,24 @@ function love.load()
 	Timer.addPeriodic(0.05, function() globals.fps = 1 / globals.dt end)
 
 	local enviroPalette = ColorPalette()
-	enviroPalette:generate({Color(255, 0, 0), Color(255, 150, 150), default = Color.clear})
+	enviroPalette:generate({
+		Color(255, 0, 0),
+		Color(255, 150, 150),
+		Color(200, 100, 100),
+		Color(255, 150, 150),
+		default = Color.clear
+	})
 	
-	blockImageData = {1, 1, 1, 1, 1, 1, 1, 1,
-					  1, 2, 2, 2, 2, 2, 2, 1,
-				  	  1, 2, 2, 2, 2, 2, 2, 1,
-				  	  1, 2, 2, 2, 2, 2, 2, 1,
-					  1, 2, 2, 2, 2, 2, 2, 1,
-					  1, 2, 2, 2, 2, 2, 2, 1,
-					  1, 2, 2, 2, 2, 2, 2, 1,
-					  1, 1, 1, 1, 1, 1, 1, 1}
+	blockImageData = {
+		1, 1, 1, 1, 1, 1, 1, 1,
+		1, 2, 2, 2, 2, 2, 2, 1,
+	  	1, 2, 2, 2, 2, 2, 2, 1,
+	  	1, 2, 2, 2, 2, 2, 2, 1,
+		1, 2, 2, 2, 2, 2, 2, 1,
+		1, 2, 2, 2, 2, 2, 2, 1,
+		1, 2, 2, 2, 2, 2, 2, 1,
+		1, 1, 1, 1, 1, 1, 1, 1
+	}
 	blockImage = enviroPalette:create_image(blockImageData, 32, 32, 4)
 
 	local playerPalette = ColorPalette()
@@ -58,6 +66,26 @@ function love.load()
 	}
 	flagImage = playerPalette:create_image(flagImageData, 16, 16, 2)
 
+	spikeImageData = {
+		0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0,
+		0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0,
+		0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0,
+		0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0,
+		0, 3, 3, 4, 0, 0, 3, 3, 4, 0, 0, 3, 3, 4, 0, 0,
+		0, 3, 3, 4, 0, 0, 3, 3, 4, 0, 0, 3, 3, 4, 0, 0,
+		0, 3, 3, 4, 0, 0, 3, 3, 4, 0, 0, 3, 3, 4, 0, 0,
+		0, 3, 3, 4, 0, 0, 3, 3, 4, 0, 0, 3, 3, 4, 0, 0,
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 0,
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 0,
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 0,
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	}
+	spikeImage = enviroPalette:create_image(spikeImageData, 32, 32, 2)
+
 	globals.gameObjects = {}
 	globals.collision = CollisionManager()
 
@@ -71,16 +99,16 @@ function love.load()
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 3, 3, 3, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 	}
 
@@ -98,12 +126,17 @@ function love.load()
 				table.insert(globals.gameObjects, block)
 			elseif room[index] == 2 then
 				if globals.flag == nil then
-					globals.flag = create_flag(Vector(j * tileWidth, i * tileHeight), flagImage)
+					local pos = Vector(j * tileWidth + (tileWidth / 2), i * tileHeight)
+					globals.flag = create_flag(pos, flagImage)
 					globals.gameObjects.flag = globals.flag
-					globals.player:get_component("CPositionable").position = Vector(j * tileWidth, i * tileHeight)
+					globals.player:get_component("CRigidBody").body:setPosition(pos.x, pos.y)
+					globals.player:get_component("CPositionable").position = pos
 				else
 					print("Already have a flag in level data, can't have more than one")
 				end
+			elseif room[index] == 3 then
+				local spike = create_spike(Vector(j * tileWidth, i * tileHeight), spikeImage)
+				table.insert(globals.gameObjects, spike)
 			end
 		end
 	end
@@ -111,7 +144,7 @@ function love.load()
 	for key, obj in pairs(globals.gameObjects) do
 		obj:start()
 		if obj:get_component("CAABoundingBox") ~= nil then
-			-- globals.collision:register(obj)
+			globals.collision:register(obj)
 		end
 	end
 
