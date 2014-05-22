@@ -18,9 +18,11 @@ CPlayerController = Class
 		self.onGround = false
 		self.vertSpeed = 0
 
-		self.jumpSpeed = -350
-		self.isJumping = false
-		self.pressJump = false
+		self.jumpTime = 0
+		self.canJump = true
+
+		self.velY = 0
+		self.prevVelY = 0
 	end
 }
 
@@ -29,52 +31,62 @@ function CPlayerController:start()
 	self.rigidbody = self:get_component("CRigidBody")
 end
 
+function CPlayerController:pre_update(dt)
+	self.prevVelY = self.velY
+end
+
+function sign(a)
+	if a < 0 then
+		return -1
+	elseif a > 0 then
+		return 1
+	else
+		return 0
+	end
+end
+
 function CPlayerController:update(dt)
 	local moveDir = 0
 
 	if love.keyboard.isDown("left") then moveDir = moveDir - 1 end
 	if love.keyboard.isDown("right") then moveDir = moveDir + 1 end
 
-	local xVel = self.rigidbody.body:getLinearVelocity()
+	local xVel, yVel = self.rigidbody.body:getLinearVelocity()
+	self.velY = yVel
 
+	if self.onGround and math.abs(self.velY) > 1 then
+		self.onGround = false
+	elseif not self.onGround and self.velY <= 0 and self.prevVelY > 0 then
+		self.onGround = true
+	end
+
+	local moveScalar = 0
+	if sign(xVel) == sign(moveScalar) then
+		moveScalar = 300 - math.abs(xVel)
+	else
+		moveScalar = 300
+	end
+	
 	self.rigidbody.body:applyForce(moveDir * (300 - math.abs(xVel)), 0)
-	self.rigidbody.body:setAngle(0)
 
-	self.velocity = self.velocity + Vector(moveDir * self.acceleration * dt, 0.0)
-	self.velocity:clamp(Vector(-self.moveSpeed, 0), Vector(self.moveSpeed, 0))
+	local jumpPressed = love.keyboard.isDown("z")
 
-	if moveDir == 0 then
-		self.velocity.x = self.velocity.x * 0.9
+	if jumpPressed and not self.onGround and self.jumpTime <= 0 then
+		self.canJump = false
+	elseif not jumpPressed and not self.canJump then
+		self.canJump = true
 	end
 
-	if math.abs(self.velocity.x) < 10 then self.velocity.x = 0 end
-
-	if not self.onGround then
-		self.vertSpeed = self.vertSpeed + self.gravity * dt
-		if self.vertSpeed > self.terminalVelocity then self.vertSpeed = self.terminalVelocity end
+	if jumpPressed and (self.onGround or self.jumpTime > 0) and self.canJump then
+		if self.jumpTime <= 0 then
+			self.rigidbody.body:applyLinearImpulse(0, -100)
+		elseif self.jumpTime < 1.5 then
+			self.rigidbody.body:applyForce(0, -50)
+		end
+		self.jumpTime = self.jumpTime + dt
 	else
-		self.vertSpeed = 0
+		self.jumpTime = 0
 	end
-
-	if love.keyboard.isDown("z") then
-		if not self.pressJump then
-			self.rigidbody.body:applyLinearImpulse(0, -250)
-		end
-		self.pressJump = true
-		if self.onGround and not self.isJumping then
-			self.isJumping = true
-			
-		end
-	else
-		self.pressJump = false
-		if self.onGround then
-			self.isJumping = false
-		end
-	end
-
-	self.velocity.y = self.vertSpeed
-	local newPosition = self.positionable.position + self.velocity * dt
-	-- self.rigidbody.body:setPosition(newPosition:unpack())
 end
 
 function CPlayerController:hit_wall(side)

@@ -19,10 +19,10 @@ function create_player(pos, image)
 	local phys = go:get_component("CRigidBody")
 	phys:init_phys(
 		love.physics.newBody(globals.world, pos.x, pos.y, "dynamic"),
-		love.physics.newCircleShape(8, 8, 8), --love.physics.newRectangleShape(8, 8, 16, 16, 0),
+		love.physics.newRectangleShape(8, 8, 16, 16, 0),
 		10
 	)
-
+	phys.body:setFixedRotation(true)
 	phys.fixture:setRestitution(0)
 
 	return go

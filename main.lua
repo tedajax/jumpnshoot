@@ -72,14 +72,14 @@ function love.load()
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 	}
@@ -132,12 +132,10 @@ function love.load()
 			local maxy = -1
 
 			if roomcopy[index] == 1 then
-				-- print(j.." "..i.." "..index)
 				minx, miny, maxx, maxy = findPhysBox(roomcopy, roomWidth, roomHeight, j, i)
 
 				local tx = (((maxx - minx) + 1) / 2 + minx) * tileWidth
 				local ty = (((maxy - miny) + 1) / 2 + miny) * tileHeight
-				print(tx.." "..ty)
 
 				local physBox = {}
 				physBox.body = love.physics.newBody(globals.world, tx, ty, "static")
@@ -156,7 +154,6 @@ function love.load()
 end
 
 function findPhysBox(room, roomwidth, roomheight, tlx, tly)
-	-- print(tlx.." "..tly)
 	local minx = tlx
 	local miny = tly
 	local maxx = minx
@@ -175,10 +172,8 @@ function findPhysBox(room, roomwidth, roomheight, tlx, tly)
 		local goDown = true
 		for x = minx, maxx - 1 do
 			local index = y * roomwidth + x + 1
-			-- print(minx.." "..maxx.." "..index)
 			if room[index] ~= 1 then
 				goDown = false
-				-- print("no down")
 			end
 		end
 		if goDown then
@@ -191,8 +186,6 @@ function findPhysBox(room, roomwidth, roomheight, tlx, tly)
 	for y = miny, maxy do
 		for x = minx, maxx - 1 do
 			local index = y * roomwidth + x + 1
-			-- print(index)
-
 			if room[index] == 1 then
 				room[index] = 0
 			end
@@ -210,6 +203,10 @@ end
 
 function love.update(dt)
 	globals.dt = dt
+
+	for key, obj in pairs(globals.gameObjects) do
+		obj:req_pre_update(dt)
+	end
 
 	globals.world:update(dt)
 	
