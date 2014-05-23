@@ -79,9 +79,9 @@ function CPlayerController:update(dt)
 
 	if jumpPressed and (self.onGround or self.jumpTime > 0) and self.canJump then
 		if self.jumpTime <= 0 then
-			self.rigidbody.body:applyLinearImpulse(0, -100)
+			self.rigidbody.body:applyLinearImpulse(0, -75)
 		elseif self.jumpTime < 1.5 then
-			self.rigidbody.body:applyForce(0, -50)
+			self.rigidbody.body:applyForce(0, -100)
 		end
 		self.jumpTime = self.jumpTime + dt
 	else
