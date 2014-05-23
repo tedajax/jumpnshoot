@@ -6,6 +6,7 @@ require 'components'
 require 'collisionmanager'
 require 'colorpalette'
 require 'gameobjectfactory'
+require 'tiledata'
 
 function love.load()
 	globals = {}
@@ -23,24 +24,17 @@ function love.load()
 
 	local enviroPalette = ColorPalette()
 	enviroPalette:generate({
-		Color(255, 0, 0),
-		Color(255, 150, 150),
+		Color(0, 255, 255),
+		Color(0, 0, 0),
 		Color(200, 100, 100),
 		Color(255, 150, 150),
 		default = Color.clear
 	})
 	
-	blockImageData = {
-		1, 1, 1, 1, 1, 1, 1, 1,
-		1, 2, 2, 2, 2, 2, 2, 1,
-	  	1, 2, 2, 2, 2, 2, 2, 1,
-	  	1, 2, 2, 2, 2, 2, 2, 1,
-		1, 2, 2, 2, 2, 2, 2, 1,
-		1, 2, 2, 2, 2, 2, 2, 1,
-		1, 2, 2, 2, 2, 2, 2, 1,
-		1, 1, 1, 1, 1, 1, 1, 1
-	}
-	blockImage = enviroPalette:create_image(blockImageData, 32, 32, 4)
+	blockImages = {}
+	for i, blockData in ipairs(tileData) do
+		table.insert(blockImages, enviroPalette:create_image(blockData, 32, 32, 4))
+	end
 
 	local playerPalette = ColorPalette()
 	playerPalette:gen_test_palette()
@@ -97,31 +91,95 @@ function love.load()
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 3, 3, 3, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 	}
 
 	local roomWidth = 25
 	local roomHeight = 17
+	local tileCount = roomWidth * roomHeight
 	local tileWidth = 32
 	local tileHeight = 32
-	local a = 50 * 34
 	for i = 0, roomHeight - 1 do
 		for j = 0, roomWidth - 1 do
 			local index = i * roomWidth + j + 1
-			-- print(i.." "..j.." "..index)
 			if room[index] == 1 then
+				local topIndex = (i - 1) * roomWidth + j + 1
+				local bottomIndex = (i + 1) * roomWidth + j + 1
+				local leftIndex = i * roomWidth + (j - 1) + 1
+				local rightIndex = i * roomWidth + (j + 1) + 1
+				local tlIndex = (i - 1) * roomWidth + (j - 1) + 1
+				local trIndex = (i - 1) * roomWidth + (j + 1) + 1
+				local blIndex = (i + 1) * roomWidth + (j - 1) + 1
+				local brIndex = (i + 1) * roomWidth + (j + 1) + 1
+
+				local adjSum = 1
+				if not roomIndexValid(i - 1, j, roomHeight, roomWidth) or room[topIndex] == 1 then
+					adjSum = adjSum + 1
+				end
+				if not roomIndexValid(i, j - 1, roomHeight, roomWidth) or room[leftIndex] == 1 then
+					adjSum = adjSum + 2
+				end
+				if not roomIndexValid(i, j + 1, roomHeight, roomWidth) or room[rightIndex] == 1 then
+					adjSum = adjSum + 4
+				end
+				if not roomIndexValid(i + 1, j, roomHeight, roomWidth) or room[bottomIndex] == 1 then
+					adjSum = adjSum + 8
+				end
+
+				local preDiagSum = adjSum
+
+				local tlEmpty = roomIndexValid(i - 1, j - 1, roomHeight, roomWidth) and room[tlIndex] ~= 1
+				local trEmpty = roomIndexValid(i - 1, j + 1, roomHeight, roomWidth) and room[trIndex] ~= 1
+				local blEmpty = roomIndexValid(i + 1, j - 1, roomHeight, roomWidth) and room[blIndex] ~= 1
+				local brEmpty = roomIndexValid(i + 1, j + 1, roomHeight, roomWidth) and room[brIndex] ~= 1
+
+				if tlEmpty then
+					adjSum = adjSum + 16
+				end
+				if trEmpty then
+					adjSum = adjSum + 32
+				end
+				if blEmpty then
+					adjSum = adjSum + 64
+				end
+				if brEmpty then
+					adjSum = adjSum + 128
+				end
+
+				local blockImage = blockImages[adjSum]
+				if blockImage == nil then
+					local imgData = {}
+					for i, v in ipairs(tileData[preDiagSum]) do
+						imgData[i] = v
+					end
+					
+					if tlEmpty then
+						imgData[1] = 1
+					end
+					if trEmpty then
+						imgData[8] = 1
+					end
+					if blEmpty then
+						imgData[57] = 1
+					end
+					if brEmpty then
+						imgData[64] = 1
+					end
+					blockImage = enviroPalette:create_image(imgData, 32, 32, 4)
+				end
+
 				local block = create_block(Vector(j * tileWidth, i * tileHeight), blockImage)
 				table.insert(globals.gameObjects, block)
 			elseif room[index] == 2 then
@@ -183,6 +241,14 @@ function love.load()
 				table.insert(globals.room, physBox)
 			end
 		end
+	end
+end
+
+function roomIndexValid(row, col, rows, cols)
+	if row < 0 or row >= rows or col < 0 or col >= cols then
+		return false
+	else
+		return true
 	end
 end
 
@@ -266,7 +332,7 @@ function love.draw()
 
 	love.graphics.setColor(255, 255, 0)
 	for i, v in ipairs(globals.room) do
-		love.graphics.polygon("line", v.body:getWorldPoints(v.shape:getPoints()))
+		--love.graphics.polygon("line", v.body:getWorldPoints(v.shape:getPoints()))
 	end
 
 	love.graphics.print("FPS : "..string.format("%.0f", globals.fps), 5, 5)
