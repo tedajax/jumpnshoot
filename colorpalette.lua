@@ -22,7 +22,7 @@ function ColorPalette:generate(data)
 end
 
 function ColorPalette:gen_test_palette()
-	self:generate({Color.red, Color.green, Color.blue, Color.yellow, default = Color.black})
+	self:generate({Color.red, Color.green, Color.blue, Color.yellow, default = Color.clear})
 end
 
 function ColorPalette:get_color(index)

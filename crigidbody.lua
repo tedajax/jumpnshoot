@@ -26,7 +26,7 @@ function CRigidBody:update(dt)
 end
 
 function CRigidBody:render()
-	love.graphics.setColor(255, 255, 0)
+	love.graphics.setColor(0, 255, 0)
 
 	if not self.shape:typeOf("CircleShape") then
 		-- love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))

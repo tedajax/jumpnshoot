@@ -17,8 +17,8 @@ function create_player(pos, image)
 	local phys = go:get_component("CRigidBody")
 	phys:init_phys(
 		love.physics.newBody(globals.world, pos.x, pos.y, "dynamic"),
-		love.physics.newRectangleShape(8, 8, 16, 16, 0),
-		10
+		love.physics.newRectangleShape(8, 12, 14, 22, 0),
+		6.666667
 	)
 	phys.body:setFixedRotation(true)
 	phys.fixture:setRestitution(0)
@@ -36,7 +36,6 @@ function create_flag(pos, image)
 	go:add_component("CColorable")
 	go:add_component("CAlignable")
 	go:add_component("CAABoundingBox")
-	go:add_component("CGravity")
 	go:add_component("CSpriteRenderer")
 
 	go:get_component("CPositionable").position = pos or Vector.zero
@@ -45,7 +44,7 @@ function create_flag(pos, image)
 	local phys = go:add_component("CRigidBody")
 	phys:init_phys(
 		love.physics.newBody(globals.world, pos.x, pos.y, "dynamic"),
-		love.physics.newRectangleShape(8, 8, 16, 16, 0),
+		love.physics.newRectangleShape(8, 8, 14, 16, 0),
 		10
 	)
 	phys.fixture:setGroupIndex(-1)
@@ -61,8 +60,9 @@ function create_spike(pos, image)
 	go:add_component("CRotatable")
 	go:add_component("CColorable")
 	go:add_component("CAlignable")
-	go:add_component("CAABoundingBox")
-	go:add_component("CGravity")
+	local bbox = go:add_component("CAABoundingBox")
+	bbox.width = 32
+	bbox.height = 32
 	go:add_component("CSpriteRenderer")
 
 	go:get_component("CPositionable").position = pos or Vector.zero

@@ -13,6 +13,11 @@ CPositionable = Class
 	end
 }
 
+function CPositionable:set(x, y)
+	self.position.x = x
+	self.position.y = y
+end
+
 function CPositionable:get_blank_data()
 	return { position = Vector(0, 0) }
 end

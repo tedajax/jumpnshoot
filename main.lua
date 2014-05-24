@@ -38,15 +38,21 @@ function love.load()
 
 	local playerPalette = ColorPalette()
 	playerPalette:gen_test_palette()
-	playerImageData = {4, 4, 4, 4, 4, 4, 4, 4,
-					   4, 0, 0, 0, 0, 0, 0, 4, 
-					   4, 0, 4, 0, 0, 4, 0, 4, 
-					   4, 0, 0, 0, 0, 0, 0, 4, 
-					   4, 0, 4, 0, 0, 4, 0, 4, 
-					   4, 0, 4, 4, 4, 4, 0, 4, 
-					   4, 0, 0, 0, 0, 0, 0, 4, 
-					   4, 4, 4, 4, 4, 4, 4, 4}
-	playerImage = playerPalette:create_image(playerImageData, 16, 16, 2)
+	playerImageData = {
+		4, 4, 4, 4, 4, 4, 4, 4,
+		4, 0, 0, 0, 0, 0, 0, 4,
+		4, 0, 4, 0, 0, 4, 0, 4,
+		4, 0, 0, 0, 0, 0, 0, 4,
+		4, 0, 4, 4, 4, 4, 0, 4,
+		4, 0, 0, 0, 0, 0, 0, 4,
+		4, 0, 0, 0, 0, 0, 0, 4,
+		4, 0, 0, 0, 0, 0, 0, 4,
+		4, 0, 0, 0, 0, 0, 0, 4,
+		4, 0, 0, 0, 0, 0, 0, 4,
+		4, 0, 0, 0, 0, 0, 0, 4,
+		4, 4, 4, 4, 4, 4, 4, 4
+	}
+	playerImage = playerPalette:create_image(playerImageData, 24, 16, 2)
 
 	flagImageData = {
 		1, 1, 1, 1, 0, 0, 0, 0,
@@ -178,6 +184,7 @@ function love.load()
 						imgData[64] = 1
 					end
 					blockImage = enviroPalette:create_image(imgData, 32, 32, 4)
+					blockImages[adjSum] = blockImage
 				end
 
 				local block = create_block(Vector(j * tileWidth, i * tileHeight), blockImage)
@@ -188,7 +195,7 @@ function love.load()
 					globals.flag = create_flag(pos, flagImage)
 					globals.gameObjects.flag = globals.flag
 					globals.player:get_component("CRigidBody").body:setPosition(pos.x, pos.y)
-					globals.player:get_component("CPositionable").position = pos
+					globals.player:get_component("CPositionable"):set(pos:unpack())
 				else
 					print("Already have a flag in level data, can't have more than one")
 				end
@@ -313,8 +320,8 @@ function love.update(dt)
 		obj:req_update(dt)
 	end
 
-	--local look = globals.player:get_component("CPositionable").position
-	-- globals.camera:lookAt(look.x, look.y)
+	-- local look = globals.player:get_component("CPositionable").position
+	-- globals.camera:lookAt(math.floor(look.x), math.floor(look.y))
 	
 	globals.collision:update(dt)
 
@@ -332,7 +339,7 @@ function love.draw()
 
 	love.graphics.setColor(255, 255, 0)
 	for i, v in ipairs(globals.room) do
-		--love.graphics.polygon("line", v.body:getWorldPoints(v.shape:getPoints()))
+		-- love.graphics.polygon("line", v.body:getWorldPoints(v.shape:getPoints()))
 	end
 
 	love.graphics.print("FPS : "..string.format("%.0f", globals.fps), 5, 5)
