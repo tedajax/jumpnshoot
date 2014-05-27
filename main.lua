@@ -190,10 +190,11 @@ function love.load()
 				local block = create_block(Vector(j * tileWidth, i * tileHeight), blockImage)
 				table.insert(globals.gameObjects, block)
 			elseif room[index] == 2 then
-				if globals.flag == nil then
+				if globals.flagObj == nil then
 					local pos = Vector(j * tileWidth + (tileWidth / 2), i * tileHeight)
-					globals.flag = create_flag(pos, flagImage)
-					globals.gameObjects.flag = globals.flag
+					globals.flagObj = create_flag(pos, flagImage)
+					globals.gameObjects.flag = globals.flagObj
+					globals.flag = globals.flagObj:get_component("CFlag")
 					globals.player:get_component("CRigidBody").body:setPosition(pos.x, pos.y)
 					globals.player:get_component("CPositionable"):set(pos:unpack())
 				else
@@ -324,6 +325,10 @@ function love.update(dt)
 	-- globals.camera:lookAt(math.floor(look.x), math.floor(look.y))
 	
 	globals.collision:update(dt)
+
+	for key, obj in pairs(globals.gameObjects) do
+		obj:req_post_update(dt)
+	end
 
 	Timer.update(dt)
 end

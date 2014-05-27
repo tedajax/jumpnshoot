@@ -42,4 +42,9 @@ function CRigidBody:init_phys(body, shape, density)
 	self.fixture = love.physics.newFixture(body, shape, density)
 end
 
+function CRigidBody:set_position(px, py)
+	self.body:setX(px)
+	self.body:setY(py)
+end
+
 ComponentFactory.get():register("CRigidBody", function(...) return CRigidBody(unpack(arg)) end)

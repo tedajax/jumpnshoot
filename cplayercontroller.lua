@@ -23,6 +23,10 @@ CPlayerController = Class
 
 		self.velY = 0
 		self.prevVelY = 0
+
+		self.flagButtonDown = false
+		self.holdingFlag = false
+		self.nextToFlag = false
 	end
 }
 
@@ -48,8 +52,13 @@ end
 function CPlayerController:update(dt)
 	local moveDir = 0
 
-	if love.keyboard.isDown("left") then moveDir = moveDir - 1 end
-	if love.keyboard.isDown("right") then moveDir = moveDir + 1 end
+	local leftDown = love.keyboard.isDown("left")
+	local rightDown = love.keyboard.isDown("right")
+	local upDown = love.keyboard.isDown("up")
+	local downDown = love.keyboard.isDown("down")
+
+	if leftDown then moveDir = moveDir - 1 end
+	if rightDown then moveDir = moveDir + 1 end
 
 	local xVel, yVel = self.rigidbody.body:getLinearVelocity()
 	self.velY = yVel
@@ -87,17 +96,56 @@ function CPlayerController:update(dt)
 	else
 		self.jumpTime = 0
 	end
+
+	local flagBtnPressed = love.keyboard.isDown("x")
+	if flagBtnPressed and not self.flagButtonDown then
+		self.flagButtonDown = true
+		if not self.holdingFlag then
+			if self.nextToFlag then
+				globals.flag:pickup()
+				self.holdingFlag = true
+			end
+		else
+			if upDown then
+				vx = 0
+				if rightDown then
+					vx = vx + 1
+				end
+				if leftDown then
+					vx = vx - 1
+				end
+				vx = vx * 50
+				globals.flag:throw(vx, -50)
+			else
+				globals.flag:drop()
+			end
+			self.holdingFlag = false
+		end
+	end
+
+	if not flagBtnPressed then
+		self.flagButtonDown = false
+	end
 end
 
 function CPlayerController:on_collision_enter(collision)
 	if collision.collider.gameObject.tag == "spike" then
 		self:respawn()
+	elseif collision.collider.gameObject.tag == "flag" then
+		self.nextToFlag = true
+	end
+end
+
+function CPlayerController:on_collision_exit(collision)
+	if collision.collider.gameObject.tag == "flag" then
+		self.nextToFlag = false
 	end
 end
 
 function CPlayerController:respawn()
 	local x, y = globals.flag:get_component("CPositionable").position:unpack()
-	self.rigidbody.body:setPosition(x, y - 2)
+	self.rigidbody.body:setPosition(x, y - 12)
+	self.rigidbody.body:setLinearVelocity(0, 0)
 end
 
 function CPlayerController:hit_wall(side)

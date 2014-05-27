@@ -37,6 +37,7 @@ function create_flag(pos, image)
 	go:add_component("CAlignable")
 	go:add_component("CAABoundingBox")
 	go:add_component("CSpriteRenderer")
+	go:add_component("CFlag")
 
 	go:get_component("CPositionable").position = pos or Vector.zero
 	go:get_component("CSpriteRenderer"):set_image(image)
